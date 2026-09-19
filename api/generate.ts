@@ -1,48 +1,23 @@
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      {
-        status: 405,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const body = await req.json();
-
-    const {
-      product,
-      audience,
-      goal,
-      style,
-    } = body;
+    const { product, audience, goal, style } = req.body || {};
 
     if (!product || !audience || !goal || !style) {
-      return new Response(
-        JSON.stringify({
-          error: "Заполнены не все поля",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return res.status(400).json({
+        error: "Заполнены не все поля",
+      });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      return new Response(
-        JSON.stringify({
-          error: "OPENAI_API_KEY не настроен в Vercel",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return res.status(500).json({
+        error: "OPENAI_API_KEY не настроен в Vercel",
+      });
     }
 
     const prompt = `
@@ -103,60 +78,34 @@ ${style}
     if (!response.ok) {
       console.error("OpenAI error:", data);
 
-      return new Response(
-        JSON.stringify({
-          error:
-            data?.error?.message ||
-            "Ошибка при обращении к OpenAI",
-        }),
-        {
-          status: response.status,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return res.status(response.status).json({
+        error:
+          data?.error?.message ||
+          "Ошибка при обращении к OpenAI",
+      });
     }
 
     const text =
+      data?.output_text ||
       data?.output
         ?.flatMap((item: any) => item.content || [])
         ?.filter((item: any) => item.type === "output_text")
         ?.map((item: any) => item.text)
-        ?.join("\n") || "";
+        ?.join("\n") ||
+      "";
 
     if (!text) {
-      return new Response(
-        JSON.stringify({
-          error: "AI не вернул текст",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return res.status(500).json({
+        error: "AI не вернул текст",
+      });
     }
 
-    return new Response(
-      JSON.stringify({
-        text,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return res.status(200).json({ text });
   } catch (error) {
     console.error(error);
 
-    return new Response(
-      JSON.stringify({
-        error: "Внутренняя ошибка сервера",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return res.status(500).json({
+      error: "Внутренняя ошибка сервера",
+    });
   }
 }

@@ -16,7 +16,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-} from "lucide-react";
+
 
 declare global {
   interface Window {
@@ -37,7 +37,7 @@ declare global {
   }
 }
 
-type Tab = ...
+
 type Tab = "home" | "create" | "analytics" | "creatives" | "profile";
 
 const gold = "#f6c453";

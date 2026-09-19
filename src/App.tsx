@@ -52,6 +52,13 @@ function App() {
     tg.expand();
   }, []);
   const [tab, setTab] = useState<Tab>("home");
+
+  const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+
+const userName =
+  telegramUser?.first_name ||
+  telegramUser?.username ||
+  "Пользователь";
   const [step, setStep] = useState(1);
 
   const [goal, setGoal] = useState("");

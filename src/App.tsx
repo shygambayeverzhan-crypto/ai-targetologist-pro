@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   ChevronRight,
@@ -16,12 +16,41 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
+} from "lucide-react";
 
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp?: {
+        ready: () => void;
+        expand: () => void;
+        initDataUnsafe?: {
+          user?: {
+            id: number;
+            first_name?: string;
+            last_name?: string;
+            username?: string;
+          };
+        };
+      };
+    };
+  }
+}
+
+type Tab = ...
 type Tab = "home" | "create" | "analytics" | "creatives" | "profile";
 
 const gold = "#f6c453";
 
 function App() {
+    useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+
+    if (!tg) return;
+
+    tg.ready();
+    tg.expand();
+  }, []);
   const [tab, setTab] = useState<Tab>("home");
   const [step, setStep] = useState(1);
 

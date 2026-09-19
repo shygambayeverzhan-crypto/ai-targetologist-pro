@@ -13,6 +13,8 @@ function App() {
   const [tab, setTab] = useState<Tab>("home");
   const [step, setStep] = useState(1);
   const [generated, setGenerated] = useState(false);
+  const [goal, setGoal] = useState("");
+  const [style, setStyle] = useState("");
 
   const nav = [
     { id: "home" as Tab, label: "Главная", icon: Home },
@@ -68,10 +70,34 @@ function App() {
             <div className="card wizard">
               {step === 1 && <Wizard title="Что рекламируем?" sub="Опиши продукт или услугу" placeholder="Например: онлайн-школа английского языка..." />}
               {step === 2 && <Wizard title="Кто ваш клиент?" sub="Опиши целевую аудиторию" placeholder="Например: предприниматели 25–45 лет..." />}
-              {step === 3 && <Wizard title="Какая цель?" sub="Выбери основную цель кампании"><div className="options">{["Получить заявки","Продать продукт","Привлечь подписчиков","Увеличить узнаваемость"].map(x=><button key={x}>{x}<ChevronRight size={16}/></button>)}</div></Wizard>}
-              {step === 4 && <Wizard title="Выбери стиль" sub="Каким должен быть рекламный текст?"><div className="options">{["Экспертный","Дерзкий","Премиальный","Дружелюбный"].map(x=><button key={x}>{x}<ChevronRight size={16}/></button>)}</div></Wizard>}
-              {step === 5 && <div className="result"><div className="resultIcon"><Sparkles/></div><h3>Реклама готова</h3><p>AI подготовил оффер, основной текст и призыв к действию.</p><div className="generated"><b>Ваш бизнес заслуживает больше клиентов.</b><br/>Получайте заявки с помощью современной рекламы, настроенной под вашу аудиторию.</div><button className="primary" onClick={generate}>{generated ? "Готово ✓" : "Сгенерировать ещё"}</button><button className="secondary"><Copy size={16}/> Скопировать</button></div>}
-              {step < 5 && <div className="wizardFooter"><button className="secondary" onClick={() => setStep(Math.max(1,step-1))}>Назад</button><button className="primary" onClick={() => setStep(step+1)}>Продолжить <ChevronRight size={17}/></button></div>}
+              {step === 3 && <Wizard title="Какая цель?" sub="Выбери основную цель кампании"><div className="options">{["Получить заявки","Продать продукт","Привлечь подписчиков","Увеличить узнаваемость"].map(x =>
+                  <button type="button" className={goal === x ? "selected" : ""} onClick={() => setGoal(x)} key={x}>
+                    <span>{x}</span><ChevronRight size={16}/>
+                  </button>
+                )}</div></Wizard>}
+              {step === 4 && <Wizard title="Выбери стиль" sub="Каким должен быть рекламный текст?"><div className="options">{["Экспертный","Дерзкий","Премиальный","Дружелюбный"].map(x =>
+                  <button type="button" className={style === x ? "selected" : ""} onClick={() => setStyle(x)} key={x}>
+                    <span>{x}</span><ChevronRight size={16}/>
+                  </button>
+                )}</div></Wizard>}
+              {step === 5 && <div className="result"><div className="resultIcon"><Sparkles/></div><h3>Реклама готова</h3><p>AI подготовил оффер, основной текст и призыв к действию.</p><div className="generated"><b>Ваш бизнес заслуживает больше клиентов.</b><br/>Получайте заявки с помощью современной рекламы, настроенной под вашу аудиторию.</div><button className="primary" onClick={generate}>{generated ? "Готово ✓" : "Сгенерировать ещё"}</button><button
+              type="button"
+              className="secondary"
+              onClick={() => navigator.clipboard?.writeText("Ваш бизнес заслуживает больше клиентов. Получайте заявки с помощью современной рекламы, настроенной под вашу аудиторию.")}
+            >
+              <Copy size={16}/> Скопировать
+            </button></div>}
+              {step < 5 && <div className="wizardFooter">
+                <button type="button" className="secondary" onClick={() => setStep(Math.max(1,step-1))}>Назад</button>
+                <button
+                  type="button"
+                  className="primary"
+                  onClick={() => setStep(step+1)}
+                  disabled={(step === 3 && !goal) || (step === 4 && !style)}
+                >
+                  Продолжить <ChevronRight size={17}/>
+                </button>
+              </div>}
             </div>
           </section>
         )}

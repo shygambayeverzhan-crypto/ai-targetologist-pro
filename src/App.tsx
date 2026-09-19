@@ -509,7 +509,12 @@ const userName =
                 "До / После",
                 "Один день из жизни клиента",
               ].map((x, i) => (
-                <div className="card creative" key={x}>
+<button
+  type="button"
+  className="card creative"
+  key={x}
+  onClick={() => setTab("create")}
+>
                   <div className="creativeNum">
                     0{i + 1}
                   </div>
